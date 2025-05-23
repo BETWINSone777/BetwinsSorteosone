@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BETWINS - Ruleta de Sorteo</title>
+  <script src="https://cdn.jsdelivr.net/npm/winwheel@2.7.0"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: url('https://raw.githubusercontent.com/BETWINSone777/betwins-assets/main/fondo.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    h1 {
+      color: white;
+      text-shadow: 1px 1px 2px #000;
+    }
+    #formulario, #ruleta-container {
+      margin-top: 30px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    canvas {
+      margin-top: 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      background: url('https://raw.githubusercontent.com/BETWINSone777/betwins-assets/main/logo-betwins-gris.png') center center no-repeat;
+      background-size: 150px;
+      background-color: #fff;
+    }
+    .hidden {
+      display: none;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 25px;
+      font-size: 16px;
+      margin: 10px 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #ganador {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 Ruleta de Sorteo BETWINS 🎉</h1>
+
+  <div id="formulario">
+    <input type="text" id="usuario" placeholder="Tu nombre de usuario" required>
+    <br>
+    <button onclick="agregarParticipante()">Inscribirme</button>
+  </div>
+
+  <div style="margin-top: 30px;">
+    <button onclick="mostrarRuleta()">🎯 Ver ruleta</button>
+    <button onclick="exportarParticipantes()">📤 Exportar</button>
+  </div>
+
+  <div id="ruleta-container" class="hidden">
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <br>
+    <button onclick="girarRuleta()">🎡 Girar</button>
+    <p id="ganador"></p>
+  </div>
+
+  <script>
+    const participantesKey = 'participantes_betwins';
+
+    function cargarParticipantes() {
+      return JSON.parse(localStorage.getItem(participantesKey)) || [];
+    }
+
+    function guardarParticipantes(participantes) {
+      localStorage.setItem(participantesKey, JSON.stringify(participantes));
+    }
+
+    function agregarParticipante() {
+      const usuarioInput = document.getElementById('usuario');
+      const usuario = usuarioInput.value.trim();
+
+      if (!usuario) {
+        alert('Por favor ingresá tu nombre de usuario.');
+        return;
+      }
+
+      let participantes = cargarParticipantes();
+
+      if (participantes.includes(usuario.toLowerCase())) {
+        alert('Este usuario ya está registrado.');
+        return;
+      }
+
+      participantes.push(usuario.toLowerCase());
+      guardarParticipantes(participantes);
+      alert('¡Inscripción exitosa!');
+      usuarioInput.value = '';
+    }
+
+    let ruleta;
+
+    function mostrarRuleta() {
+      document.getElementById('formulario').classList.add('hidden');
+      document.getElementById('ruleta-container').classList.remove('hidden');
+      const participantes = cargarParticipantes();
+
+      if (participantes.length === 0) {
+        alert('No hay participantes.');
+        return;
+      }
+
+      ruleta = new Winwheel({
+        numSegments: participantes.length,
+        segments: participantes.map(nombre => ({
+          fillStyle: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
+          text: nombre
+        })),
+        animation: {
+          type: 'spinToStop',
+          duration: 5,
+          spins: 8,
+          callbackFinished: alertGanador
+        }
+      });
+    }
+
+    function girarRuleta() {
+      if (ruleta) ruleta.startAnimation();
+    }
+
+    function alertGanador(segmento) {
+      document.getElementById('ganador').textContent = `🎉 Ganador: ${segmento.text}`;
+    }
+
+    function exportarParticipantes() {
+      const participantes = cargarParticipantes();
+      if (participantes.length === 0) {
+        alert('No hay participantes.');
+        return;
+      }
+
+      const contenido = 'Usuario\n' + participantes.join('\n');
+      const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'participantes_betwins.csv');
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
