@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BETWINS - Inscripción</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('WhatsApp Image 2025-05-23 at 9.49.49 AM.jpeg');
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .marca-agua {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.15;
+      width: 400px;
+      z-index: 0;
+    }
+
+    .contenido {
+      position: relative;
+      z-index: 1;
+      background-color: rgba(0,0,0,0.6);
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 280px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .mensaje {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <img src="WhatsApp Image 2025-05-23 at 9.49.49 AM.jpeg" alt="Marca de agua" class="marca-agua">
+  
+  <div class="contenido">
+    <h1>Inscripción a Sorteo BETWINS</h1>
+    <input type="text" id="usuario" placeholder="Ingresá tu nombre de usuario" required>
+    <br>
+    <button onclick="registrarUsuario()">Inscribirme</button>
+    <p class="mensaje" id="mensaje"></p>
+  </div>
+
+  <script>
+    const key = 'participantes_betwins';
+
+    function registrarUsuario() {
+      const input = document.getElementById('usuario');
+      const nombre = input.value.trim().toLowerCase();
+      const mensaje = document.getElementById('mensaje');
+
+      if (!nombre) {
+        mensaje.textContent = 'Por favor, ingresá un nombre válido.';
+        mensaje.style.color = 'yellow';
+        return;
+      }
+
+      const registrados = JSON.parse(localStorage.getItem(key)) || [];
+
+      if (registrados.includes(nombre)) {
+        mensaje.textContent = 'Este usuario ya está registrado.';
+        mensaje.style.color = 'orange';
+        return;
+      }
+
+      registrados.push(nombre);
+      localStorage.setItem(key, JSON.stringify(registrados));
+      mensaje.textContent = '¡Inscripción exitosa!';
+      mensaje.style.color = 'lightgreen';
+      input.value = '';
+    }
+  </script>
+</body>
+</html>
+<body style="background: url('logo_betwins.jpeg') no-repeat center center fixed; background-size: cover;">
